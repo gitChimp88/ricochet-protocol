@@ -412,42 +412,43 @@ import { waffle, ethers } from "hardhat";
            }).exec(aliceSigner);
 
             const feeRate = 1000;
-           await launchpad.setFeeRate(feeRate);
-           expect(await launchpad.getFeeRate()).to.equal(feeRate);
+            await launchpad.setFeeRate(feeRate);
+            expect(await launchpad.getFeeRate()).to.equal(feeRate);
 
             const sharePrice = await launchpad.getSharePrice();
-           console.log('get share price - ', sharePrice);
-           // at 0 what should it be?
+            expect(sharePrice).to.equal(0);
 
             const inputToken = await launchpad.getInputToken();
-           expect(inputToken).to.equal("0xCAa7349CEA390F89641fe306D93591f87595dc1F");
+            expect(inputToken).to.equal("0xCAa7349CEA390F89641fe306D93591f87595dc1F");
 
             const outputToken = await launchpad.getOutputToken();
-           expect(outputToken).to.equal("0x263026E7e53DBFDce5ae55Ade22493f828922965");
+            expect(outputToken).to.equal("0x263026E7e53DBFDce5ae55Ade22493f828922965");
 
             const outputIndexId = await launchpad.getOutputIndexId();
-           console.log('output index id - ', outputIndexId);
-           // at 0 what should it be?
+            expect(outputIndexId).to.equal(0);
 
             const outputRate = await launchpad.getOutputRate();
-           expect(outputRate).to.equal(1000);
+            expect(outputRate).to.equal(1000);
 
             const getInflow = await launchpad.getTotalInflow();
-           expect(getInflow).to.equal(1000000000000);
+            expect(getInflow).to.equal(1000000000000);
 
             const getLastDistributionAt = await launchpad.getLastDistributionAt();
-           expect((getLastDistributionAt.toNumber())).to.be.above(0);
+            expect((getLastDistributionAt.toNumber())).to.be.above(0);
 
             const getOwner = await launchpad.getOwner();
-           expect(getOwner).to.equal("0x3226C9EaC0379F04Ba2b1E1e1fcD52ac26309aeA");
+            expect(getOwner).to.equal("0x3226C9EaC0379F04Ba2b1E1e1fcD52ac26309aeA");
 
             const getStreamRate = await launchpad.getStreamRate(aliceSigner.address);
-           expect(getStreamRate).to.equal(1000000000000);
+            expect(getStreamRate).to.equal(1000000000000);
 
         });
 
         it("#2.2 transfers ownership", async () => {
            // transfer ownership and check owner
+            await launchpad.transferOwnership(aliceSigner.address);
+            const getOwner = await launchpad.getOwner();
+            expect(getOwner).to.equal(aliceSigner.address);
        });
 
         it("#2.3 test stream", async () => {
