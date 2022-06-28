@@ -451,10 +451,48 @@ import { waffle, ethers } from "hardhat";
             expect(getOwner).to.equal(aliceSigner.address);
        });
 
-        it("#2.3 test stream", async () => {
-           // open and close stream and check share amount is correct
-       });
+    });
 
+    context("#3 - rex launchpad open / close stream", async () => {
+        beforeEach(async () => {
+            // Revert to the point REXMarket was just deployed
+            const success = await provider.send('evm_revert', [
+                snapshot
+            ]);
+            // Take another snapshot to be able to revert again next time
+            snapshot = await provider.send('evm_snapshot', []);
+            expect(success).to.equal(true);
+        });
+
+        afterEach(async () => {
+            // Check the app isn't jailed
+            expect(await launchpad.isAppJailed()).to.equal(false);
+            await resetMeasurements();
+        });
+
+        it("#3.1 open and close stream", async () => {
+            // open and close stream and check share amount is correct
+            await sf.cfaV1.createFlow({
+                sender: aliceSigner.address,
+                receiver: launchpad.address,
+                superToken: ricochetUSDCx.address,
+                flowRate: inflowRateUsdc,
+            }).exec(aliceSigner);
+
+            expect(
+                (await launchpad.getIDAShares(ETHX_SUBSCRIPTION_INDEX, aliceSigner.address)).toString()
+            ).to.equal(`true,false,1000,0`); 
+
+            await sf.cfaV1.deleteFlow({
+                receiver: launchpad.address,
+                sender: aliceSigner.address,
+                superToken: ricochetUSDCx.address
+            }).exec(aliceSigner);
+
+            expect(
+                (await launchpad.getIDAShares(ETHX_SUBSCRIPTION_INDEX, aliceSigner.address)).toString()
+            ).to.equal(`true,false,0,0`);
+        });
     });
 
  });
